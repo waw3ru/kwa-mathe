@@ -1,0 +1,32 @@
+name: Kwa Mathe Ci/Cd
+
+on:
+  push:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Configure node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+
+      - name: Setup project
+        run: pnpm install
+
+      - name: Formatting
+        run: pnpm format
+
+      - name: Linting
+        run: pnpm lint
+
+      - name: Building
+        run: pnpm build
+
