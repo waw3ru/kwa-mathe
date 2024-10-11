@@ -1,5 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+
 import {DbService} from './services';
 
 @Component({
