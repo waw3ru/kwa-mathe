@@ -2,7 +2,7 @@
 const eslint = require("@eslint/js");
 const tseslint = require("typescript-eslint");
 const angular = require("angular-eslint");
-const simpleImportSort = required("eslint-plugin-simple-import-sort");
+const simpleImportSort = require("eslint-plugin-simple-import-sort");
 
 module.exports = tseslint.config(
   {

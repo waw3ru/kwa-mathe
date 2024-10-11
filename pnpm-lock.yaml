@@ -35,6 +35,9 @@ importers:
       rxjs:
         specifier: ~7.8.0
         version: 7.8.1
+      tinybase:
+        specifier: ^5.3.2
+        version: 5.3.2(prettier@3.3.3)(ws@8.18.0)
       tslib:
         specifier: ^2.3.0
         version: 2.7.0
@@ -54,6 +57,9 @@ importers:
       '@types/jasmine':
         specifier: ~5.1.0
         version: 5.1.4
+      '@types/node':
+        specifier: ^22.7.5
+        version: 22.7.5
       angular-eslint:
         specifier: 18.3.1
         version: 18.3.1(@angular-devkit/core@18.2.8(chokidar@3.6.0))(@angular-devkit/schematics@18.2.8(chokidar@3.6.0))(@typescript-eslint/utils@8.8.1(eslint@9.12.0(jiti@1.21.6))(typescript@5.5.4))(eslint@9.12.0(jiti@1.21.6))(typescript-eslint@8.2.0(eslint@9.12.0(jiti@1.21.6))(typescript@5.5.4))(typescript@5.5.4)
@@ -81,6 +87,9 @@ importers:
       karma-jasmine-html-reporter:
         specifier: ~2.1.0
         version: 2.1.0(jasmine-core@5.2.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4)
+      prettier:
+        specifier: ^3.3.3
+        version: 3.3.3
       typescript:
         specifier: ~5.5.2
         version: 5.5.4
@@ -3789,6 +3798,11 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
+  prettier@3.3.3:
+    resolution: {integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   proc-log@4.2.0:
     resolution: {integrity: sha512-g8+OnU/L2v+wyiVK+D5fA34J7EH8jZ8DDlvwhRCMxmMj7UCBvxiO1mGeN+36JXIKF4zevU4kRBd8lVgG9vLelA==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
@@ -4280,6 +4294,66 @@ packages:
 
   thunky@1.1.0:
     resolution: {integrity: sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA==}
+
+  tinybase@5.3.2:
+    resolution: {integrity: sha512-QGXiy7GSU4+3vnFP8gVb3PKXoU9qfxPD6K7PK0R6bHbu3d3yfGqhwtQOVNgwJvLbH+k2lOOL5IV5KkFZeDOTng==}
+    hasBin: true
+    peerDependencies:
+      '@automerge/automerge-repo': ^1.2.0
+      '@electric-sql/pglite': ^0.2.10
+      '@libsql/client': ^0.14.0
+      '@powersync/common': ^1.18.1
+      '@sqlite.org/sqlite-wasm': ^3.46.1-build3
+      '@vlcn.io/crsqlite-wasm': ^0.16.0
+      electric-sql: ^0.12.1
+      expo: ^51.0.0
+      expo-sqlite: ^14.0.5
+      partykit: ^0.0.111
+      partysocket: ^1.0.2
+      postgres: ^3.4.4
+      prettier: ^3.3.2
+      react: ^18.2.0
+      react-dom: ^18.2.0
+      sqlite3: ^5.1.7
+      ws: ^8.17.0
+      yjs: ^13.6.19
+    peerDependenciesMeta:
+      '@automerge/automerge-repo':
+        optional: true
+      '@electric-sql/pglite':
+        optional: true
+      '@libsql/client':
+        optional: true
+      '@powersync/common':
+        optional: true
+      '@sqlite.org/sqlite-wasm':
+        optional: true
+      '@vlcn.io/crsqlite-wasm':
+        optional: true
+      electric-sql:
+        optional: true
+      expo:
+        optional: true
+      expo-sqlite:
+        optional: true
+      partykit:
+        optional: true
+      partysocket:
+        optional: true
+      postgres:
+        optional: true
+      prettier:
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      sqlite3:
+        optional: true
+      ws:
+        optional: true
+      yjs:
+        optional: true
 
   tmp@0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}
@@ -8751,6 +8825,8 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
+  prettier@3.3.3: {}
+
   proc-log@4.2.0: {}
 
   process-nextick-args@2.0.1: {}
@@ -9314,6 +9390,11 @@ snapshots:
       tslib: 2.7.0
 
   thunky@1.1.0: {}
+
+  tinybase@5.3.2(prettier@3.3.3)(ws@8.18.0):
+    optionalDependencies:
+      prettier: 3.3.3
+      ws: 8.18.0
 
   tmp@0.0.33:
     dependencies:

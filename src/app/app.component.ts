@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import {DbService} from './services';
 
 @Component({
   selector: 'mathe-root',
@@ -9,9 +10,14 @@ import { RouterOutlet } from '@angular/router';
     <h1>Welcome to {{title}}!</h1>
 
     <router-outlet />
-  `,
-  styleUrl: './app.component.scss'
+  `
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  readonly #srvDb = inject(DbService);
+
   title = 'kwa-mathe';
+
+  public ngOnInit() {
+    this.#srvDb.initDb();
+  }
 }
