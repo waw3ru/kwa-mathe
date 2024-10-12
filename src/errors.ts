@@ -18,3 +18,13 @@ export class AlreadyExistsError extends GenericError {
     this.data = data;
   }
 }
+
+export class OpError extends GenericError {
+  override name = 'OpError';
+  readonly opName: string;
+
+  constructor(message: string, opName: string) {
+    super(message);
+    this.opName = opName;
+  }
+}

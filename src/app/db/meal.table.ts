@@ -1,21 +1,57 @@
-import type { Queries, Store } from 'tinybase';
 import { createQueries } from 'tinybase';
 
-import { MealCategoryType, MealCellType, MealType } from '../../@types';
+import { MealCellType, MealType } from '../../@types';
 import { AlreadyExistsError, NotFoundError } from '../../errors';
 import { DbTables } from './constants';
+import { db } from './db';
 
-class MealTable {
-  static readonly id = DbTables.meal;
+export const mealQueries = createQueries(db);
 
-  readonly #query: Queries;
+export const _dataParser = (query: string) => {
+  const data: MealType[] = [];
 
-  constructor(private readonly store: Store) {
-    this.#query = createQueries(this.store);
-  }
+  mealQueries.forEachResultRow(query, (mealRef) => {
+    const cell = mealQueries.getResultRow(query, mealRef);
 
-  save = (data: Omit<MealType, 'isAvailable'>) => {
-    if (this.#checkIfExists(data.mealRef)) {
+    if (Object.keys(cell).length === 0) return;
+
+    data.push({
+      mealRef,
+      ...cell,
+    } as MealType);
+  });
+
+  return data;
+};
+
+export const mealDbOps = {
+  checkIfExists: (mealRef: string) => {
+    const data = db.getRow(DbTables.meal, mealRef);
+
+    return Object.keys(data).length !== 0;
+  },
+  update: (mealRef: string, update: Partial<MealCellType>) => {
+    if (mealDbOps.checkIfExists(mealRef)) {
+      throw new NotFoundError('Meal not found');
+    }
+
+    if ('isAvailable' in update) {
+      db.setCell(DbTables.meal, mealRef, 'isAvailable', update.isAvailable!);
+    }
+    if ('price' in update) {
+      db.setCell(DbTables.meal, mealRef, 'price', update.price!);
+    }
+    if ('type' in update) {
+      db.setCell(DbTables.meal, mealRef, 'type', update.type!);
+    }
+    if ('name' in update) {
+      db.setCell(DbTables.meal, mealRef, 'name', update.name!);
+    }
+
+    return true;
+  },
+  save: (data: Omit<MealType, 'isAvailable'>) => {
+    if (mealDbOps.checkIfExists(data.mealRef)) {
       throw new AlreadyExistsError(`Meal already exists`, {
         mealRef: data.mealRef,
       });
@@ -28,73 +64,20 @@ class MealTable {
       type: data.type,
     } satisfies MealCellType;
 
-    this.store.setRow(MealTable.id, data.mealRef, cell);
+    db.setRow(DbTables.meal, data.mealRef, cell);
+
     return true;
-  };
+  },
+  get: (mealRef: string) => {
+    const data = db.getRow(DbTables.meal, mealRef);
 
-  update = (mealRef: string, update: Partial<MealCellType>) => {
-    if (this.#checkIfExists(mealRef)) {
-      throw new NotFoundError('Meal not found');
+    if (Object.keys(data).length === 0) {
+      throw new NotFoundError(`Meal with meal-ref: ${mealRef} does not exist}`);
     }
 
-    if ('isAvailable' in update) {
-      this.store.setCell(
-        MealTable.id,
-        mealRef,
-        'isAvailable',
-        update.isAvailable!
-      );
-    }
-    if ('price' in update) {
-      this.store.setCell(MealTable.id, mealRef, 'price', update.price!);
-    }
-    if ('type' in update) {
-      this.store.setCell(MealTable.id, mealRef, 'type', update.type!);
-    }
-    if ('name' in update) {
-      this.store.setCell(MealTable.id, mealRef, 'name', update.name!);
-    }
-  };
-
-  queryMealByCategory = (type: MealCategoryType) => {
-    const queryName = 'queryMealByCategory';
-
-    this.#query.setQueryDefinition(
-      queryName,
-      MealTable.id,
-      ({ select, where }) => {
-        select('name');
-        select('price');
-        select('isAvailable');
-        where('type', type);
-      }
-    );
-
-    return this.#parseQuery(queryName);
-  };
-
-  #checkIfExists = (mealRef: string) => {
-    const data = this.store.getRow(MealTable.id, mealRef);
-
-    return Object.keys(data).length !== 0;
-  };
-
-  #parseQuery = (query: string) => {
-    const data: MealType[] = [];
-
-    this.#query.forEachResultRow(query, (mealRef) => {
-      const cell = this.#query.getResultRow(query, mealRef);
-
-      if (Object.keys(cell).length === 0) return;
-
-      data.push({
-        mealRef,
-        ...cell,
-      } as MealType);
-    });
-
-    return data;
-  };
-}
-
-export const initMealTable = (store: Store) => new MealTable(store);
+    return {
+      mealRef,
+      ...data,
+    } as MealType;
+  },
+};

@@ -1,4 +1,3 @@
-import type { Queries, Store } from 'tinybase';
 import { createQueries } from 'tinybase';
 
 import {
@@ -6,22 +5,38 @@ import {
   CustomerType,
   EmployeeCellType,
   EmployeeType,
-  PersonType,
 } from '../../@types';
 import { AlreadyExistsError, NotFoundError } from '../../errors';
 import { DbTables } from './constants';
+import { db } from './db';
 
-class PersonTable {
-  static readonly id = DbTables.person;
+export const personQueries = createQueries(db);
 
-  readonly #query: Queries;
+export const _dataParser = (query: string) => {
+  const data: (EmployeeType | CustomerType)[] = [];
 
-  constructor(private readonly store: Store) {
-    this.#query = createQueries(this.store);
-  }
+  personQueries.forEachResultRow(query, (contact) => {
+    const cell = personQueries.getResultRow(query, contact);
 
-  save = (data: CustomerType | EmployeeType) => {
-    if (this.checkIfExists(data.contact)) {
+    if (Object.keys(cell).length === 0) return;
+
+    data.push({
+      contact,
+      ...cell,
+    } as EmployeeType | CustomerType);
+  });
+
+  return data;
+};
+
+export const personDbOps = {
+  checkIfExists: (contact: string) => {
+    const data = db.getRow(DbTables.person, contact);
+
+    return Object.keys(data).length !== 0;
+  },
+  save: () => (data: CustomerType | EmployeeType) => {
+    if (personDbOps.checkIfExists(data.contact)) {
       throw new AlreadyExistsError(`Person already exists`, {
         contact: data.contact,
         name: data.name,
@@ -35,70 +50,28 @@ class PersonTable {
         personType: data.type,
       } satisfies EmployeeCellType;
 
-      this.store.setRow(PersonTable.id, data.contact, cell);
+      db.setRow(DbTables.person, data.contact, cell);
     } else {
       const cell = {
         name: data.name,
         personType: data.type,
       } satisfies CustomerCellType;
 
-      this.store.setRow(PersonTable.id, data.contact, cell);
+      db.setRow(DbTables.person, data.contact, cell);
     }
 
     return true;
-  };
+  },
+  get: (contact: string) => {
+    const data = db.getRow(DbTables.person, contact);
 
-  checkIfExists = (contact: string) => {
-    const data = this.store.getRow(PersonTable.id, contact);
-
-    return Object.keys(data).length !== 0;
-  };
-
-  get = (contact: string) => {
-    const data = this.store.getRow(PersonTable.id, contact);
-
-    if (Object.keys(data).length !== 0) {
+    if (Object.keys(data).length === 0) {
       throw new NotFoundError(`Person with ID: ${contact} does not exist}`);
     }
 
     return {
       contact,
       ...data,
-    } as EmployeeType;
-  };
-
-  queryPersonByType = (type: 'customer' | 'employee') => {
-    this.#query.setQueryDefinition(
-      'queryPersonByType',
-      PersonTable.id,
-      ({ select, where }) => {
-        if (type === 'employee') {
-          select('employeeId');
-        }
-        select('name');
-        where('personType', type);
-      }
-    );
-
-    return this.#parseQuery('queryPersonByType');
-  };
-
-  #parseQuery = (query: string) => {
-    const data: PersonType[] = [];
-
-    this.#query.forEachResultRow(query, (contact) => {
-      const cell = this.#query.getResultRow(query, contact);
-
-      if (Object.keys(cell).length === 0) return;
-
-      data.push({
-        contact,
-        ...cell,
-      } as PersonType);
-    });
-
-    return data;
-  };
-}
-
-export const initPersonTable = (store: Store) => new PersonTable(store);
+    } as EmployeeType | CustomerType;
+  },
+};

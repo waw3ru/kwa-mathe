@@ -27,8 +27,8 @@ export class WelcomeComponent implements OnInit {
     });
 
     this.#srvDb.dbChannel.postMessage({
-      message: DbOp.QUERY_MEAL,
-      data: 'food',
+      message: DbOp.GET_MEAL,
+      data: 'rice',
     });
 
     this.#srvDb.dbChannel.onmessage = ({ data }) => {

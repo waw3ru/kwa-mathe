@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import type { OpType } from './@types';
-import { ops } from './app/db/tinybase';
+import { ops } from './app/db';
 
 addEventListener(
   'message',

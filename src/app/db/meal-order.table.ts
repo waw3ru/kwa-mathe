@@ -1,16 +1,12 @@
-import type { Queries, Store } from 'tinybase';
 import { createQueries } from 'tinybase';
 
-import { DbTables } from './constants';
+import { db } from './db';
 
-class MealOrderTable {
-  static readonly id = DbTables.mealOrder;
+export const mealOrderQueries = createQueries(db);
 
-  readonly #query: Queries;
+export const _dataParser = (query: string) => {};
 
-  constructor(private readonly store: Store) {
-    this.#query = createQueries(this.store);
-  }
-}
-
-export const initMealOrderTable = (store: Store) => new MealOrderTable(store);
+export const mealOrderOps = {
+  save: () => {},
+  get: () => {},
+};

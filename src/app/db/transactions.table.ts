@@ -1,17 +1,12 @@
-import type { Queries, Store } from 'tinybase';
 import { createQueries } from 'tinybase';
 
-import { DbTables } from './constants';
+import { db } from './db';
 
-class TransactionsTable {
-  static readonly id = DbTables.transactions;
+export const transactionrQueries = createQueries(db);
 
-  readonly #query: Queries;
+export const _dataParser = (query: string) => {};
 
-  constructor(private readonly store: Store) {
-    this.#query = createQueries(this.store);
-  }
-}
-
-export const initTransactionsTable = (store: Store) =>
-  new TransactionsTable(store);
+export const transactionOps = {
+  save: () => {},
+  get: () => {},
+};
