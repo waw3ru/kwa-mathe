@@ -7,8 +7,8 @@
     "build": "ng build",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
-    "format": "prettier --check *",
-    "format:write": "prettier --write *"
+    "format": "prettier --check \"{src,.vscode,.github}/**/*.{ts,js,html,scss,css,yml.yaml,json}\"",
+    "format:write": "prettier --write \"{src,.vscode,.github}/**/*.{ts,js,html,scss,css,yml.yaml,json}\""
   },
   "private": true,
   "dependencies": {
