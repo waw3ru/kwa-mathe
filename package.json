@@ -8,7 +8,8 @@
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format": "prettier --check \"{src,.vscode,.github}/**/*.{ts,js,html,scss,css,yml.yaml,json}\"",
-    "format:write": "prettier --write \"{src,.vscode,.github}/**/*.{ts,js,html,scss,css,yml.yaml,json}\""
+    "format:write": "prettier --write \"{src,.vscode,.github}/**/*.{ts,js,html,scss,css,yml.yaml,json}\"",
+    "fix:ci": "pnpm lint:fix; pnpm format:write"
   },
   "private": true,
   "dependencies": {

@@ -1,4 +1,4 @@
-import type { DbOp } from './app/db/messages';
+import type { DbOp } from './app/db/constants';
 
 type DbMessageType = typeof DbOp;
 export type OpType = DbMessageType[keyof DbMessageType];
@@ -31,10 +31,11 @@ export interface EmployeeType extends PersonType {
 }
 
 export interface MealType {
-  mealRef: number;
+  mealRef: string;
   name: string;
   type: MealCategoryType;
   price: number;
+  isAvailable: boolean;
 }
 
 export interface MealOrderType {
@@ -79,3 +80,5 @@ export type EmployeeCellType = PersonCellType & {
   personType: 'employee';
   employeeId: string;
 };
+
+export type MealCellType = Omit<MealType, 'mealRef'>;

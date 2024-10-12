@@ -1,7 +1,8 @@
 import type { OnInit } from '@angular/core';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
-import { DbOp } from '../../db/messages';
+import type { MealType } from '../../../@types';
+import { DbOp } from '../../db/constants';
 import { DbService } from '../../services';
 
 @Component({
@@ -16,8 +17,18 @@ export class WelcomeComponent implements OnInit {
 
   public ngOnInit() {
     this.#srvDb.dbChannel.postMessage({
-      message: DbOp.QUERY_PERSON,
-      data: 'employee',
+      message: DbOp.SAVE_MEAL,
+      data: {
+        mealRef: 'rice',
+        type: 'food',
+        name: 'Rice',
+        price: 12.45,
+      } as Omit<MealType, 'isAvailable'>,
+    });
+
+    this.#srvDb.dbChannel.postMessage({
+      message: DbOp.QUERY_MEAL,
+      data: 'food',
     });
 
     this.#srvDb.dbChannel.onmessage = ({ data }) => {

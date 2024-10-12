@@ -11,4 +11,10 @@ export class NotFoundError extends GenericError {
 
 export class AlreadyExistsError extends GenericError {
   override name = 'AlreadyExistsError';
+  readonly data: unknown;
+
+  constructor(message: string, data: unknown) {
+    super(message);
+    this.data = data;
+  }
 }

@@ -9,9 +9,10 @@ import {
   PersonType,
 } from '../../@types';
 import { NotFoundError } from '../../errors';
+import { DbTables } from './constants';
 
 class PersonTable {
-  static readonly id = 'person';
+  static readonly id = DbTables.person;
 
   readonly #query: Queries;
 

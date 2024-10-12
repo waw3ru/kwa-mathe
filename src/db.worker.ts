@@ -1,13 +1,13 @@
 /// <reference lib="webworker" />
 
 import type { OpType } from './@types';
-import { personDbOps } from './app/db/tinybase';
+import { ops } from './app/db/tinybase';
 
 addEventListener(
   'message',
   ({ data }: MessageEvent<{ message: OpType; data: never }>) => {
     try {
-      const reply = personDbOps(data);
+      const reply = ops(data);
 
       postMessage({
         message: data.message,
