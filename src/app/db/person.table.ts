@@ -8,7 +8,7 @@ import {
   EmployeeType,
   PersonType,
 } from '../../@types';
-import { NotFoundError } from '../../errors';
+import { AlreadyExistsError, NotFoundError } from '../../errors';
 import { DbTables } from './constants';
 
 class PersonTable {
@@ -21,7 +21,12 @@ class PersonTable {
   }
 
   save = (data: CustomerType | EmployeeType) => {
-    if (this.checkIfExists(data.contact)) return false;
+    if (this.checkIfExists(data.contact)) {
+      throw new AlreadyExistsError(`Person already exists`, {
+        contact: data.contact,
+        name: data.name,
+      });
+    }
 
     if (data.type === 'employee') {
       const cell = {
@@ -31,16 +36,14 @@ class PersonTable {
       } satisfies EmployeeCellType;
 
       this.store.setRow(PersonTable.id, data.contact, cell);
+    } else {
+      const cell = {
+        name: data.name,
+        personType: data.type,
+      } satisfies CustomerCellType;
 
-      return true;
+      this.store.setRow(PersonTable.id, data.contact, cell);
     }
-
-    const cell = {
-      name: data.name,
-      personType: data.type,
-    } satisfies CustomerCellType;
-
-    this.store.setRow(PersonTable.id, data.contact, cell);
 
     return true;
   };
