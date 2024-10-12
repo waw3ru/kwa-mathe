@@ -1,8 +1,5 @@
-export type DbProcedureMessageType = Lowercase<
-  keyof typeof DbProcedureMessages
->;
-export const DbProcedureMessages = {
-  SAVE_PERSON: 'save_person',
-  GET_CUSTOMERS: 'get_customers',
-  GET_EMPLOYEES: 'get_employees',
-};
+export const DbOp = {
+  QUERY_PERSON: 'person.query',
+  SAVE_PERSON: 'person.save',
+  GET_PERSON: 'person.get',
+} as const;

@@ -1,4 +1,5 @@
-import { createQueries, Queries, Store } from 'tinybase';
+import type { Queries, Store } from 'tinybase';
+import { createQueries } from 'tinybase';
 
 import {
   CustomerCellType,
@@ -7,13 +8,8 @@ import {
   EmployeeType,
   PersonType,
 } from '../../@types';
+import { NotFoundError } from '../../errors';
 
-/**
- * @schema {
- *  rowName: phone-number of the person
- *  cells: person details i.e. Name, personType
- * }
- */
 class PersonTable {
   static readonly id = 'person';
 
@@ -23,9 +19,6 @@ class PersonTable {
     this.#query = createQueries(this.store);
   }
 
-  /**
-   * @returns - true means was saved, false means already exists
-   */
   save = (data: CustomerType | EmployeeType) => {
     if (this.checkIfExists(data.contact)) return false;
 
@@ -55,6 +48,19 @@ class PersonTable {
     const data = this.store.getRow(PersonTable.id, contact);
 
     return Object.keys(data).length !== 0;
+  };
+
+  get = (contact: string) => {
+    const data = this.store.getRow(PersonTable.id, contact);
+
+    if (Object.keys(data).length !== 0) {
+      throw new NotFoundError(`Person with ID: ${contact} does not exist}`);
+    }
+
+    return {
+      contact,
+      ...data,
+    } as EmployeeType;
   };
 
   queryPersonByType = (type: 'customer' | 'employee') => {

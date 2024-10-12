@@ -1,3 +1,7 @@
+import type { DbOp } from './app/db/messages';
+
+type DbMessageType = typeof DbOp;
+export type OpType = DbMessageType[keyof DbMessageType];
 export type MealCategoryType = 'food' | 'beverage' | 'soft-drink';
 export type OrderStatusType = 'started' | 'ongoing' | 'completed';
 export type PaymentMethodType = 'cash' | 'm-pesa' | 'm-banking';
@@ -27,7 +31,7 @@ export interface EmployeeType extends PersonType {
 }
 
 export interface MealType {
-  id: number;
+  mealRef: number;
   name: string;
   type: MealCategoryType;
   price: number;

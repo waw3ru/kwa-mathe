@@ -1,5 +1,6 @@
 // @ts-check
 const eslint = require('@eslint/js');
+const importPlugin = require('eslint-plugin-import');
 const tseslint = require('typescript-eslint');
 const angular = require('angular-eslint');
 const simpleImportSort = require('eslint-plugin-simple-import-sort');
@@ -9,6 +10,7 @@ module.exports = tseslint.config(
     files: ['**/*.ts'],
     extends: [
       eslint.configs.recommended,
+      importPlugin.flatConfigs.recommended,
       ...tseslint.configs.recommended,
       ...tseslint.configs.stylistic,
       ...angular.configs.tsRecommended,
@@ -18,8 +20,10 @@ module.exports = tseslint.config(
       'simple-import-sort': simpleImportSort,
     },
     rules: {
+      'import/no-unresolved': 'off',
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
+      'import/consistent-type-specifier-style': 'error',
       '@angular-eslint/directive-selector': [
         'error',
         {

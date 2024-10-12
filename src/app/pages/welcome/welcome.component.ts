@@ -1,11 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import type { OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
-import { DbProcedureMessages } from '../../db/messages';
+import { DbOp } from '../../db/messages';
 import { DbService } from '../../services';
 
 @Component({
@@ -20,7 +16,8 @@ export class WelcomeComponent implements OnInit {
 
   public ngOnInit() {
     this.#srvDb.dbChannel.postMessage({
-      message: DbProcedureMessages.GET_EMPLOYEES,
+      message: DbOp.QUERY_PERSON,
+      data: 'employee',
     });
 
     this.#srvDb.dbChannel.onmessage = ({ data }) => {

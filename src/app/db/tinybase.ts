@@ -1,27 +1,28 @@
 import { createStore } from 'tinybase';
 
-import { DbProcedureMessages, DbProcedureMessageType } from './messages';
+import type { OpType } from '../../@types';
+import { DbOp } from './messages';
 import { initPersonTable } from './person.table';
 
 const db = createStore();
 const personTable = initPersonTable(db);
 
 interface DbOpType {
-  message: DbProcedureMessageType;
+  message: OpType;
   data: never;
 }
 
 export const personDbOps = ({ message, ...op }: DbOpType) => {
   switch (message) {
-    case DbProcedureMessages.GET_CUSTOMERS: {
-      return personTable.queryPersonByType('customer');
+    case DbOp.QUERY_PERSON: {
+      return personTable.queryPersonByType(op.data);
     }
 
-    case DbProcedureMessages.GET_EMPLOYEES: {
-      return personTable.queryPersonByType('employee');
+    case DbOp.GET_PERSON: {
+      return personTable.get(op.data);
     }
 
-    case DbProcedureMessages.SAVE_PERSON: {
+    case DbOp.SAVE_PERSON: {
       return personTable.save(op.data);
     }
 
