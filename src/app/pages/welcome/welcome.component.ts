@@ -5,6 +5,7 @@ import {
   OnInit,
 } from '@angular/core';
 
+import { DbProcedureMessages } from '../../db/messages';
 import { DbService } from '../../services';
 
 @Component({
@@ -19,7 +20,11 @@ export class WelcomeComponent implements OnInit {
 
   public ngOnInit() {
     this.#srvDb.dbChannel.postMessage({
-      hello: 'world',
+      message: DbProcedureMessages.GET_EMPLOYEES,
     });
+
+    this.#srvDb.dbChannel.onmessage = ({ data }) => {
+      console.log(data);
+    };
   }
 }

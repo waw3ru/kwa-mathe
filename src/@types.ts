@@ -1,7 +1,3 @@
-/**
- * Contains all the typings used in the whole application
- */
-
 export type MealCategoryType = 'food' | 'beverage' | 'soft-drink';
 export type OrderStatusType = 'started' | 'ongoing' | 'completed';
 export type PaymentMethodType = 'cash' | 'm-pesa' | 'm-banking';
@@ -17,9 +13,17 @@ export interface PaymentType {
 }
 
 export interface PersonType {
-  id: number;
   name: string;
   contact: string;
+}
+
+export interface CustomerType extends PersonType {
+  type: 'customer';
+}
+
+export interface EmployeeType extends PersonType {
+  type: 'employee';
+  employeeId: string;
 }
 
 export interface MealType {
@@ -33,8 +37,8 @@ export interface MealOrderType {
   id: number;
   refCode: string;
   order: MealType[];
-  customer: PersonType;
-  servedBy: PersonType;
+  customer: CustomerType;
+  servedBy: EmployeeType;
   currentStatus: OrderStatusType;
   orderLog: {
     timestamp: number;
@@ -46,13 +50,28 @@ export interface TransactionType {
   id: number;
   refCode: string;
   order: MealOrderType;
-  totalAmount: number;
   tip: PaymentType | undefined;
   discount: PaymentType | undefined;
   status: TransactionStatusType;
   paymentMethod: PaymentMethodType;
+  paidBy: CustomerType;
   transactionLog: {
     timestamp: number;
     status: TransactionStatusType;
   }[];
+  get totalAmount(): number;
 }
+
+export interface PersonCellType {
+  personType: 'customer' | 'employee';
+  name: string;
+}
+
+export type CustomerCellType = PersonCellType & {
+  personType: 'customer';
+};
+
+export type EmployeeCellType = PersonCellType & {
+  personType: 'employee';
+  employeeId: string;
+};
