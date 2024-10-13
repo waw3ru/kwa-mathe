@@ -1,6 +1,7 @@
 import type { DbOp } from './app/db/constants';
 
-type DbMessageType = typeof DbOp;
+export type JSONArrayString = `[${string}]`;
+export type DbMessageType = typeof DbOp;
 export type OpType = DbMessageType[keyof DbMessageType];
 export type MealCategoryType = 'food' | 'beverage' | 'soft-drink';
 export type OrderStatusType = 'started' | 'ongoing' | 'completed';
@@ -10,6 +11,11 @@ export type TransactionStatusType =
   | 'pending'
   | 'failed'
   | 'completed';
+
+export interface LogType<T> {
+  timestamp: number;
+  status: T;
+}
 
 export interface PaymentType {
   mode: 'percentage' | 'cash';
@@ -39,20 +45,15 @@ export interface MealType {
 }
 
 export interface MealOrderType {
-  id: number;
   refCode: string;
   order: MealType[];
   customer: CustomerType;
   servedBy: EmployeeType;
-  currentStatus: OrderStatusType;
-  orderLog: {
-    timestamp: number;
-    status: OrderStatusType;
-  }[];
+  status: OrderStatusType;
+  orderLog: LogType<OrderStatusType>[];
 }
 
 export interface TransactionType {
-  id: number;
   refCode: string;
   order: MealOrderType;
   tip: PaymentType | undefined;
@@ -60,10 +61,7 @@ export interface TransactionType {
   status: TransactionStatusType;
   paymentMethod: PaymentMethodType;
   paidBy: CustomerType;
-  transactionLog: {
-    timestamp: number;
-    status: TransactionStatusType;
-  }[];
+  transactionLog: LogType<TransactionStatusType>[];
   get totalAmount(): number;
 }
 
@@ -82,3 +80,14 @@ export type EmployeeCellType = PersonCellType & {
 };
 
 export type MealCellType = Omit<MealType, 'mealRef'>;
+
+export type AddNewMealType = Omit<MealType, 'isAvailable'>;
+
+export type MealOrderCellType = Omit<MealOrderType, 'refCode'> & {
+  customer: string;
+  servedBy: string;
+  order: JSONArrayString;
+  orderLog: JSONArrayString;
+};
+
+export type AddMealOrderCellType = Omit<MealOrderType, 'status' | 'orderLog'>;

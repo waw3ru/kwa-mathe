@@ -1,6 +1,6 @@
 import { createQueries } from 'tinybase';
 
-import { MealCellType, MealType } from '../../@types';
+import { AddNewMealType, MealCellType, MealType } from '../../@types';
 import { AlreadyExistsError, NotFoundError } from '../../errors';
 import { DbTables } from './constants';
 import { db } from './db';
@@ -50,7 +50,7 @@ export const mealDbOps = {
 
     return true;
   },
-  save: (data: Omit<MealType, 'isAvailable'>) => {
+  save: (data: AddNewMealType) => {
     if (mealDbOps.checkIfExists(data.mealRef)) {
       throw new AlreadyExistsError(`Meal already exists`, {
         mealRef: data.mealRef,
