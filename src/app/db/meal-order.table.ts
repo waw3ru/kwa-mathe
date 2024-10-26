@@ -19,15 +19,15 @@ export const mealOrderQueries = createQueries(db);
 export const _dataParser = (query: string) => {
   const data: MealOrderType[] = [];
 
-  mealOrderQueries.forEachResultRow(query, (refCode) => {
-    const cell = mealQueries.getResultRow(query, refCode);
+  mealOrderQueries.forEachResultRow(query, (tableId) => {
+    const cell = mealQueries.getResultRow(query, tableId);
 
     if (Object.keys(cell).length === 0) return;
 
     const customer = personDbOps.get(cell['customer'] as string);
     const servedBy = personDbOps.get(cell['servedBy'] as string);
     const result = {
-      refCode,
+      tableId,
       status: cell['status'],
       servedBy,
       customer,
@@ -50,9 +50,9 @@ export const mealOrderDbOps = {
     return Object.keys(data).length !== 0;
   },
   save: (data: AddMealOrderCellType) => {
-    if (mealOrderDbOps.checkIfExists(data.refCode)) {
+    if (mealOrderDbOps.checkIfExists(data.tableId)) {
       throw new AlreadyExistsError(`Meal Order already exists`, {
-        refCode: data.refCode,
+        refCode: data.tableId,
         order: data.order,
       });
     }
@@ -61,29 +61,32 @@ export const mealOrderDbOps = {
       status: 'started',
       orderLog: JSON.stringify([]) as never,
       servedBy: data.servedBy.contact as never,
+      preparedBy: data.preparedBy.contact as never,
       customer: data.customer.contact as never,
       order: JSON.stringify(data.order ?? []) as never,
     } satisfies MealOrderCellType;
 
-    db.setRow(DbTables.meal, data.refCode, cell);
+    db.setRow(DbTables.meal, data.tableId, cell);
 
     return true;
   },
-  get: (refCode: string) => {
-    const data = db.getRow(DbTables.mealOrder, refCode);
+  get: (tableId: string) => {
+    const data = db.getRow(DbTables.mealOrder, tableId);
 
     if (Object.keys(data).length === 0) {
       throw new NotFoundError(
-        `Meal Order with ref-code: ${refCode} does not exist}`
+        `Meal Order with ref-code: ${tableId} does not exist}`
       );
     }
 
     const customer = personDbOps.get(data['customer'] as string);
     const servedBy = personDbOps.get(data['servedBy'] as string);
+    const preparedBy = personDbOps.get(data['preparedBy'] as string);
 
     return {
-      refCode,
+      tableId,
       status: data['status'],
+      preparedBy,
       servedBy,
       customer,
       order: JSON.parse(data['order'] as string) as MealType[],

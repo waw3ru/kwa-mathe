@@ -34,6 +34,7 @@ export interface CustomerType extends PersonType {
 export interface EmployeeType extends PersonType {
   type: 'employee';
   employeeId: string;
+  employeeType: 'cook' | 'server';
 }
 
 export interface MealType {
@@ -45,10 +46,11 @@ export interface MealType {
 }
 
 export interface MealOrderType {
-  refCode: string;
+  tableId: string;
   order: MealType[];
   customer: CustomerType;
   servedBy: EmployeeType;
+  preparedBy: EmployeeType;
   status: OrderStatusType;
   orderLog: LogType<OrderStatusType>[];
 }
@@ -77,15 +79,17 @@ export type CustomerCellType = PersonCellType & {
 export type EmployeeCellType = PersonCellType & {
   personType: 'employee';
   employeeId: string;
+  employeeType: 'cook' | 'server';
 };
 
 export type MealCellType = Omit<MealType, 'mealRef'>;
 
 export type AddNewMealType = Omit<MealType, 'isAvailable'>;
 
-export type MealOrderCellType = Omit<MealOrderType, 'refCode'> & {
+export type MealOrderCellType = Omit<MealOrderType, 'tableId'> & {
   customer: string;
   servedBy: string;
+  preparedBy: string;
   order: JSONArrayString;
   orderLog: JSONArrayString;
 };

@@ -48,6 +48,7 @@ export const personDbOps = {
         employeeId: data.employeeId,
         name: data.name,
         personType: data.type,
+        employeeType: data.employeeType,
       } satisfies EmployeeCellType;
 
       db.setRow(DbTables.person, data.contact, cell);
