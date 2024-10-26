@@ -102,7 +102,7 @@ export const mealOrderDbOps = {
       ) as LogType<OrderStatusType>[],
     } as MealOrderType;
   },
-  _updateOrderMeals: ({
+  updateOrder: ({
     tableId,
     order = [],
   }: {
@@ -133,7 +133,7 @@ export const mealOrderDbOps = {
 
     return { added: true };
   },
-  _logStatusUpdate: (data: { tableId: string; employeeId: string }) => {
+  updateStatus: (data: { tableId: string; employeeId: string }) => {
     if (!mealOrderDbOps.checkIfExists(data.tableId)) {
       throw new NotFoundError(
         `Meal Order with table ID: ${data.tableId} does not exist`
@@ -228,7 +228,7 @@ export const mealOrderDbOps = {
         return { logged: false };
     }
   },
-  _getMealOrderStatus: (tableId: string) => {
+  fetchStatus: (tableId: string) => {
     const order = mealOrderDbOps.get(tableId);
     const lastLog = order.orderLog[order.orderLog.length - 1];
 
