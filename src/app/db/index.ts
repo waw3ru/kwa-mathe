@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { OpError } from '../../errors';
+import { GenericError } from '../../errors';
 import { mealDbOps } from './meal.table';
 import { personDbOps } from './person.table';
 
@@ -26,7 +26,7 @@ export const ops = ({ message, data }: DbOpType) => {
     }
 
     default: {
-      throw new OpError('Table does not exists', table);
+      throw new GenericError('Table does not exists');
     }
   }
 };

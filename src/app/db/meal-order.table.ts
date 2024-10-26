@@ -2,13 +2,14 @@ import { createQueries } from 'tinybase';
 
 import {
   AddMealOrderCellType,
+  EmployeeType,
   LogType,
   MealOrderCellType,
   MealOrderType,
   MealType,
   OrderStatusType,
 } from '../../@types';
-import { AlreadyExistsError, NotFoundError } from '../../errors';
+import { AlreadyExistsError, NotFoundError, OpError } from '../../errors';
 import { DbTables } from './constants';
 import { db } from './db';
 import { mealQueries } from './meal.table';
@@ -24,13 +25,11 @@ export const _dataParser = (query: string) => {
 
     if (Object.keys(cell).length === 0) return;
 
-    const customer = personDbOps.get(cell['customer'] as string);
     const servedBy = personDbOps.get(cell['servedBy'] as string);
     const result = {
       tableId,
       status: cell['status'],
       servedBy,
-      customer,
       order: JSON.parse(cell['order'] as string) as MealType[],
       orderLog: JSON.parse(
         cell['order'] as string
@@ -44,12 +43,12 @@ export const _dataParser = (query: string) => {
 };
 
 export const mealOrderDbOps = {
-  checkIfExists: (refCode: string) => {
-    const data = db.getRow(DbTables.mealOrder, refCode);
+  checkIfExists: (tableId: string) => {
+    const data = db.getRow(DbTables.mealOrder, tableId);
 
     return Object.keys(data).length !== 0;
   },
-  save: (data: AddMealOrderCellType) => {
+  create: (data: AddMealOrderCellType) => {
     if (mealOrderDbOps.checkIfExists(data.tableId)) {
       throw new AlreadyExistsError(`Meal Order already exists`, {
         refCode: data.tableId,
@@ -58,11 +57,8 @@ export const mealOrderDbOps = {
     }
 
     const cell = {
-      status: 'started',
+      status: 'pending',
       orderLog: JSON.stringify([]) as never,
-      servedBy: data.servedBy.contact as never,
-      preparedBy: data.preparedBy.contact as never,
-      customer: data.customer.contact as never,
       order: JSON.stringify(data.order ?? []) as never,
     } satisfies MealOrderCellType;
 
@@ -75,19 +71,30 @@ export const mealOrderDbOps = {
 
     if (Object.keys(data).length === 0) {
       throw new NotFoundError(
-        `Meal Order with ref-code: ${tableId} does not exist}`
+        `Meal Order with table ID: ${tableId} does not exist}`
       );
     }
 
     const customer = personDbOps.get(data['customer'] as string);
-    const servedBy = personDbOps.get(data['servedBy'] as string);
-    const preparedBy = personDbOps.get(data['preparedBy'] as string);
+
+    let served!: EmployeeType;
+    if ((data['status'] as OrderStatusType) !== 'pending') {
+      served = personDbOps.get(data['servedBy'] as string);
+    }
+
+    let prepared!: EmployeeType;
+    if (
+      (data['status'] as OrderStatusType) !== 'pending' ||
+      (data['status'] as OrderStatusType) !== 'taken'
+    ) {
+      prepared = personDbOps.get(data['preparedBy'] as string);
+    }
 
     return {
       tableId,
       status: data['status'],
-      preparedBy,
-      servedBy,
+      preparedBy: prepared,
+      servedBy: served,
       customer,
       order: JSON.parse(data['order'] as string) as MealType[],
       orderLog: JSON.parse(
@@ -95,16 +102,143 @@ export const mealOrderDbOps = {
       ) as LogType<OrderStatusType>[],
     } as MealOrderType;
   },
-  _addMealToOrder: () => {
-    //
+  _updateOrderMeals: ({
+    tableId,
+    order = [],
+  }: {
+    tableId: string;
+    order: MealType[];
+  }) => {
+    if (!mealOrderDbOps.checkIfExists(tableId)) {
+      throw new NotFoundError(
+        `Meal Order with table ID: ${tableId} does not exist`
+      );
+    }
+
+    const { status } = mealOrderDbOps.get(tableId);
+
+    if (status !== 'pending') {
+      throw new OpError(
+        `Not allowed to add update meals on order while status is ${status.toUpperCase()}`,
+        'UpdateOrderMeals'
+      );
+    }
+
+    db.setCell(
+      DbTables.mealOrder,
+      tableId,
+      'order',
+      JSON.stringify(order ?? [])
+    );
+
+    return { added: true };
   },
-  _removeMealFromOrder: () => {
-    //
+  _logStatusUpdate: (data: { tableId: string; employeeId: string }) => {
+    if (!mealOrderDbOps.checkIfExists(data.tableId)) {
+      throw new NotFoundError(
+        `Meal Order with table ID: ${data.tableId} does not exist`
+      );
+    }
+
+    // Ensure employee exists
+    personDbOps.get(data.employeeId);
+
+    const { orderLog } = mealOrderDbOps.get(data.tableId);
+
+    /**
+     * First log
+     */
+    if (!orderLog.length) {
+      db.setCell(DbTables.mealOrder, data.tableId, 'servedBy', data.employeeId);
+
+      db.setCell(
+        DbTables.mealOrder,
+        data.tableId,
+        'orderLog',
+        JSON.stringify([
+          {
+            status: 'taken',
+            timestamp: Date.now(),
+          },
+        ])
+      );
+
+      return { logged: true };
+    }
+
+    const lastLog = orderLog[orderLog.length - 1];
+
+    switch (lastLog.status) {
+      case 'taken': {
+        orderLog.push({
+          status: 'preparing',
+          timestamp: Date.now(),
+        });
+
+        db.setCell(
+          DbTables.mealOrder,
+          data.tableId,
+          'preparedBy',
+          data.employeeId
+        );
+
+        db.setCell(
+          DbTables.mealOrder,
+          data.tableId,
+          'orderLog',
+          JSON.stringify(orderLog)
+        );
+
+        return { logged: true };
+      }
+
+      case 'preparing': {
+        orderLog.push({
+          status: 'served',
+          timestamp: Date.now(),
+        });
+
+        db.setCell(
+          DbTables.mealOrder,
+          data.tableId,
+          'orderLog',
+          JSON.stringify(orderLog)
+        );
+
+        return { logged: true };
+      }
+
+      case 'served': {
+        orderLog.push({
+          status: 'completed',
+          timestamp: Date.now(),
+        });
+
+        db.setCell(
+          DbTables.mealOrder,
+          data.tableId,
+          'orderLog',
+          JSON.stringify(orderLog)
+        );
+
+        return { logged: true };
+      }
+
+      default:
+        return { logged: false };
+    }
   },
-  _logStatusUpdate: () => {
-    //
-  },
-  _getLastOrderStatus: () => {
-    //
+  _getMealOrderStatus: (tableId: string) => {
+    const order = mealOrderDbOps.get(tableId);
+    const lastLog = order.orderLog[order.orderLog.length - 1];
+
+    return {
+      tableId: order.tableId,
+      status: lastLog,
+      isCustomerServed: lastLog.status === 'taken',
+      hasOrderBeenTaken: lastLog.status === 'preparing',
+      hasOrderBeenPrepared: lastLog.status === 'served',
+      awaitingPayment: lastLog.status === 'completed',
+    };
   },
 };

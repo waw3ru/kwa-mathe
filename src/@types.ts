@@ -4,7 +4,12 @@ export type JSONArrayString = `[${string}]`;
 export type DbMessageType = typeof DbOp;
 export type OpType = DbMessageType[keyof DbMessageType];
 export type MealCategoryType = 'food' | 'beverage' | 'soft-drink';
-export type OrderStatusType = 'started' | 'ongoing' | 'completed';
+export type OrderStatusType =
+  | 'pending'
+  | 'taken'
+  | 'preparing'
+  | 'served'
+  | 'completed';
 export type PaymentMethodType = 'cash' | 'm-pesa' | 'm-banking';
 export type TransactionStatusType =
   | 'initiated'
@@ -22,18 +27,9 @@ export interface PaymentType {
   amount: number;
 }
 
-export interface PersonType {
-  name: string;
-  contact: string;
-}
-
-export interface CustomerType extends PersonType {
-  type: 'customer';
-}
-
-export interface EmployeeType extends PersonType {
-  type: 'employee';
+export interface EmployeeType {
   employeeId: string;
+  name: string;
   employeeType: 'cook' | 'server';
 }
 
@@ -48,9 +44,8 @@ export interface MealType {
 export interface MealOrderType {
   tableId: string;
   order: MealType[];
-  customer: CustomerType;
-  servedBy: EmployeeType;
-  preparedBy: EmployeeType;
+  servedBy?: EmployeeType;
+  preparedBy?: EmployeeType;
   status: OrderStatusType;
   orderLog: LogType<OrderStatusType>[];
 }
@@ -62,34 +57,23 @@ export interface TransactionType {
   discount: PaymentType | undefined;
   status: TransactionStatusType;
   paymentMethod: PaymentMethodType;
-  paidBy: CustomerType;
+  paidBy: string; // phone no. OR email address
   transactionLog: LogType<TransactionStatusType>[];
   get totalAmount(): number;
 }
 
-export interface PersonCellType {
-  personType: 'customer' | 'employee';
+export interface EmployeeCellType {
   name: string;
-}
-
-export type CustomerCellType = PersonCellType & {
-  personType: 'customer';
-};
-
-export type EmployeeCellType = PersonCellType & {
-  personType: 'employee';
-  employeeId: string;
   employeeType: 'cook' | 'server';
-};
+}
 
 export type MealCellType = Omit<MealType, 'mealRef'>;
 
 export type AddNewMealType = Omit<MealType, 'isAvailable'>;
 
 export type MealOrderCellType = Omit<MealOrderType, 'tableId'> & {
-  customer: string;
-  servedBy: string;
-  preparedBy: string;
+  servedBy?: string;
+  preparedBy?: string;
   order: JSONArrayString;
   orderLog: JSONArrayString;
 };
