@@ -2,6 +2,7 @@ name: Kwa Mathe Ci/Cd
 
 on:
   push:
+    branches: main
 
 jobs:
   ci:
