@@ -1,15 +1,19 @@
-import { TransactionRecord, TransactionsTableOp } from '../utils.worker';
+import { TransactionRecord } from '../common';
 
-export class TransactionsTable implements TransactionsTableOp {
-  save(data: TransactionRecord): [void, Error | undefined] {
-    throw new Error('Method not implemented.');
+export class TransactionsTable {
+  ops() {
+    //
   }
 
-  getAll(): [TransactionRecord[], Error | undefined] {
-    throw new Error('Method not implemented.');
+  saveTransaction(data: TransactionRecord) {
+    //
   }
 
-  updateIsPaid(orderId: string): [void, Error | undefined] {
-    throw new Error('Method not implemented.');
+  getAllTransactions() {
+    //
+  }
+
+  getTransaction(transactionId: number) {
+    //
   }
 }

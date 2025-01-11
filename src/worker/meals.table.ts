@@ -1,22 +1,23 @@
-import { MealRecord, MealsTableOp } from '../utils.worker';
+import { MealRecord } from '../common';
 
-export class MealsTable implements MealsTableOp {
-  save(data: MealRecord): [void, Error | undefined] {
-    throw new Error('Method not implemented.');
+export class MealsTable {
+  ops() {
+    //
   }
 
-  getAll(): [MealRecord[], Error | undefined] {
-    throw new Error('Method not implemented.');
+  saveMeal(data: MealRecord) {
+    //
   }
 
-  get(mealId: string): [MealRecord, Error | undefined] {
-    throw new Error('Method not implemented.');
+  getAllMeal() {
+    //
   }
 
-  update(
-    mealId: string,
-    data: Omit<MealRecord, 'mealId'>
-  ): [void, Error | undefined] {
-    throw new Error('Method not implemented.');
+  getMeal(mealId: string) {
+    //]
+  }
+
+  updateMeal(updates: { mealId: string; data: Omit<MealRecord, 'mealId'> }) {
+    //
   }
 }

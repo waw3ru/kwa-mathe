@@ -1,15 +1,19 @@
-import { LogRecord, LogsTableOp } from '../utils.worker';
+import { LogRecord } from '../common';
 
-export class LogsTable implements LogsTableOp {
-  log(data: LogRecord): void {
-    throw new Error('Method not implemented.');
+export class LogsTable {
+  ops() {
+    //
   }
 
-  query(start: number, end: number): LogRecord[] {
-    throw new Error('Method not implemented.');
+  createLogEntry(data: LogRecord) {
+    //
   }
 
-  getAll(): LogRecord[] {
-    throw new Error('Method not implemented.');
+  queryLogEntries($q: { start: number; end: number }) {
+    //
+  }
+
+  getAllLogEntries() {
+    //
   }
 }
