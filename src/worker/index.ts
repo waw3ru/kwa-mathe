@@ -1,6 +1,6 @@
 import { createStore } from 'tinybase';
 
-import { DatabaseOpType, DatabaseTables } from './utils';
+import { DatabaseOp, DatabaseTables } from '../utils.worker';
 
 export class Database {
   readonly #tables = DatabaseTables;
@@ -9,7 +9,7 @@ export class Database {
     this.#create();
   }
 
-  connect({ message, data }: DatabaseOpType) {
+  connect({ message, data }: DatabaseOp) {
     // pass all the ops here!
   }
 
