@@ -10,7 +10,17 @@ export class Database {
   }
 
   connect({ message, data }: DatabaseOp) {
-    // pass all the ops here!
+    const [tableName, tableOp] = message;
+    switch (tableName) {
+      case DatabaseTables.LOGS:
+        return;
+      case DatabaseTables.MEALS:
+        return;
+      case DatabaseTables.MEAL_ORDERS:
+        return;
+      case DatabaseTables.TRANSACTIONS:
+        return;
+    }
   }
 
   #create() {
